@@ -34,11 +34,14 @@ class LEVELDB_EXPORT Slice {
 
   // Create a slice that refers to the contents of "s"
   Slice(const std::string& s) : data_(s.data()), size_(s.size()) {}
+  // std::basic_string<CharT, Traits, Allocator>::data()
+  // 返回指向字符串首字符的指针 std::basic_string<CharT, Traits,
+  // Allocator>::size() 返回字符串的长度
 
-  // Create a slice that refers to s[0,strlen(s)-1]
+  // Create a slice that refers to s[0,strlen(s)-1], i.e., s[0,strlen(s)).
   Slice(const char* s) : data_(s), size_(strlen(s)) {}
 
-  // Intentionally copyable.
+  // Intentionally copyable. cooyable constructor and assignment operator
   Slice(const Slice&) = default;
   Slice& operator=(const Slice&) = default;
 
@@ -102,7 +105,17 @@ inline bool operator!=(const Slice& x, const Slice& y) { return !(x == y); }
 
 inline int Slice::compare(const Slice& b) const {
   const size_t min_len = (size_ < b.size_) ? size_ : b.size_;
-  int r = memcmp(data_, b.data_, min_len);
+  int r = memcmp(data_, b.data_, min_len);  // min_len is smart here.
+  /*
+   * memcmp() 函数是用来比较两个字符串的大小的，其原型为：
+   * int memcmp(const void *s1, const void *s2, size_t n);
+   * s1 和 s2 是要进行比较的两个字符串，n 是要比较的字符数。
+   * 如果返回值 < 0，则表示 str1 小于 str2；
+   * 如果返回值 > 0，则表示 str2 小于 str1；
+   * 如果返回值 = 0，则表示 str1 等于 str2。
+   * 以上比较均为字典序。
+   * [https://beej.us/guide/bgclr/html/split/stringref.html#man-strcmp]
+   */
   if (r == 0) {
     if (size_ < b.size_)
       r = -1;

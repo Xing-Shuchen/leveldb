@@ -16,6 +16,7 @@
   do {                       \
   } while (0)
 #endif
+// do { } while (0) 是一个常见的宏定义技巧，它可以让一段代码块看起来像一个语句。
 
 namespace leveldb {
 
